@@ -1,0 +1,58 @@
+server:
+  port: 8081
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: mayramedranda17@gmail.com
+    password: sofo oayu ybhl xpwn
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  #NEON.TECH
+  datasource:
+    url: jdbc:postgresql://ep-round-silence-a8f18yh7-pooler.eastus2.azure.neon.tech/neondb?user=neondb_owner&password=npg_fFKXsP16ANZc&sslmode=require&channelBinding=require
+    username:
+    password:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+        connection-timeout: 30000
+        maximum-pool-size: 5
+        idle-timeout: 600000
+        max-lifetime: 1800000
+
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+flashbang:
+  date: 2025-07-08T12:00:00
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+
+  logging:
+    level:
+      org.hibernate.SQL: DEBUG
+      org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+      com.cosbell.spa: DEBUG
+
+whatsapp:
+  phone-number-id: TU_PHONE_NUMBER_ID
+  access-token: TU_ACCESS_TOKEN
