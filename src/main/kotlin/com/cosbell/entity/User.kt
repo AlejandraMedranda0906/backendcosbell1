@@ -17,6 +17,9 @@ data class User(
     @Column(nullable = false, length = 100)
     var password: String,
 
+    @Column(nullable = true, length = 20)
+    var phone: String? = null,
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_roles",
@@ -24,6 +27,7 @@ data class User(
         inverseJoinColumns = [JoinColumn(name = "role_id")]
     )
     val roles: List<Role> = listOf()
+
 )
 
 //var locked: Boolean = false,

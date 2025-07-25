@@ -66,6 +66,7 @@ class SecurityConfig(
                         "/ws-native",
                         "/error"
                     ).permitAll()
+                    .requestMatchers("/users/me").authenticated() // 👉 Permitido solo con token válido
                     .requestMatchers("/api/citas/employee/**").hasRole("EMPLOYEE")
                     .requestMatchers("/api/citas/admin/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
@@ -91,4 +92,4 @@ class SecurityConfig(
         source.registerCorsConfiguration("/**", config)
         return source
     }
-} 
+}

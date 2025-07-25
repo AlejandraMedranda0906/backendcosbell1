@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import com.cosbell.dto.RegisterRequest
 import com.cosbell.dto.EmployeeWithServicesDTO
+import org.springframework.http.ResponseEntity
+import java.security.Principal
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("api/users")
 class UserController(private val userService: UserService) {
 
     @PostMapping
@@ -35,4 +37,22 @@ class UserController(private val userService: UserService) {
         val admins = userService.getAdmins()
         return admins + employees
     }
+
+    @GetMapping("/me")
+    fun getCurrentUser(principal: Principal): ResponseEntity<Map<String, String?>> {
+        val user = userService.getByEmail(principal.name)
+            ?: return ResponseEntity.notFound().build()
+
+        return ResponseEntity.ok(
+            mapOf(
+                "email" to user.email,
+                "phone" to user.phone
+            )
+        )
+    }
+    @GetMapping("/debug")
+    fun debug(): String {
+        return "Debug OK"
+    }
+
 }

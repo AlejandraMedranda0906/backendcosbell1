@@ -162,6 +162,10 @@ class UserService(
     fun getAdmins(): List<User> {
         return userRepository.findByRoles_Name("ADMIN")
     }
+    fun getByEmail(email: String): User? {
+        return userRepository.findByEmail(email)
+    }
+
 }
 
 
