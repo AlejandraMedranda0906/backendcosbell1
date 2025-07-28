@@ -1,9 +1,16 @@
 package com.cosbell.service
 
-import com.cosbell.dto.HorarioRequest
 import com.cosbell.dto.ProfessionalRegisterRequest
-import com.cosbell.entity.*
-import com.cosbell.repository.*
+import com.cosbell.dto.HorarioRequest
+import com.cosbell.entity.User
+import com.cosbell.entity.Horario
+import com.cosbell.entity.EmployeeServiceSpecialty
+import com.cosbell.entity.EmployeeServiceSpecialtyId
+import com.cosbell.repository.UserRepository
+import com.cosbell.repository.RoleRepository
+import com.cosbell.repository.HorarioRepository
+import com.cosbell.repository.ServicioRepository
+import com.cosbell.repository.EmployeeServiceSpecialtyRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -31,27 +38,29 @@ class ProfessionalRegistrationService(
             name = request.name,
             email = request.email,
             password = passwordEncoder.encode(request.password),
-            phone = request.phone, // <-- AGREGA ESTA LÍNEA
+            phone = request.phone,
             roles = listOf(role)
         )
+
         val savedUser = userRepository.save(user)
 
-        // Save schedules for the professional
-        request.schedules.forEach { scheduleRequest ->
+        // Guardar horarios
+        request.schedules.forEach { sch ->
             val horario = Horario(
-                dia = scheduleRequest.dia,
-                horaInicio = scheduleRequest.horaInicio,
-                horaFin = scheduleRequest.horaFin,
+                dia = sch.dia,
+                horaInicio = sch.horaInicio,
+                horaFin = sch.horaFin,
                 user = savedUser
             )
             horarioRepository.save(horario)
         }
 
-        // Link services to the professional if it's an employee
+        // Guardar especialidades si es empleado
         if (request.roleName.uppercase() == "EMPLOYEE") {
             request.serviceIds.forEach { serviceId ->
-                val service = servicioRepository.findById(serviceId).orElse(null)
-                    ?: throw IllegalArgumentException("Servicio con ID $serviceId no encontrado.")
+                val service = servicioRepository.findById(serviceId)
+                    .orElseThrow { IllegalArgumentException("Servicio con ID $serviceId no encontrado.") }
+
                 val employeeSpecialty = EmployeeServiceSpecialty(
                     id = EmployeeServiceSpecialtyId(employeeId = savedUser.id, serviceId = service.id),
                     employee = savedUser,
@@ -64,8 +73,76 @@ class ProfessionalRegistrationService(
         return savedUser
     }
 
-    fun getAllEmployees(): List<User> {
-        // Eliminamos la búsqueda del rol y usamos directamente el nombre del rol en la consulta.
-        return userRepository.findByRoles_Name("EMPLOYEE")
+    fun getAllEmployees(): List<User> =
+        userRepository.findByRoles_Name("EMPLOYEE")
+
+    @Transactional
+    fun updateProfessional(id: Long, request: ProfessionalRegisterRequest): User {
+        val user = userRepository.findById(id)
+            .orElseThrow { IllegalArgumentException("Profesional con ID $id no encontrado.") }
+
+        // Actualizar campos básicos
+        user.apply {
+            name = request.name
+            phone = request.phone
+        }
+
+        // Actualizar email si cambió
+        if (user.email != request.email) {
+            if (userRepository.existsByEmail(request.email)) {
+                throw IllegalArgumentException("El correo ya está registrado.")
+            }
+            user.email = request.email
+        }
+
+        // Actualizar password si se provee
+        if (!request.password.isNullOrBlank()) {
+            user.password = passwordEncoder.encode(request.password)
+        }
+
+        val updatedUser = userRepository.save(user)
+
+        // Reemplazar horarios
+        horarioRepository.deleteAllByUser(updatedUser)
+        request.schedules.forEach { sch ->
+            horarioRepository.save(
+                Horario(
+                    dia = sch.dia,
+                    horaInicio = sch.horaInicio,
+                    horaFin = sch.horaFin,
+                    user = updatedUser
+                )
+            )
+        }
+
+        // Reemplazar especialidades si es empleado
+        if (request.roleName.uppercase() == "EMPLOYEE") {
+            employeeServiceSpecialtyRepository.deleteAllByEmployee(updatedUser)
+            request.serviceIds.forEach { serviceId ->
+                val service = servicioRepository.findById(serviceId)
+                    .orElseThrow { IllegalArgumentException("Servicio con ID $serviceId no encontrado.") }
+                employeeServiceSpecialtyRepository.save(
+                    EmployeeServiceSpecialty(
+                        id = EmployeeServiceSpecialtyId(employeeId = updatedUser.id, serviceId = service.id),
+                        employee = updatedUser,
+                        service = service
+                    )
+                )
+            }
+        }
+
+        return updatedUser
+    }
+
+    @Transactional
+    fun deleteProfessional(id: Long) {
+        val user = userRepository.findById(id)
+            .orElseThrow { IllegalArgumentException("Profesional con ID $id no encontrado.") }
+
+        // Borrar horarios y especialidades
+        horarioRepository.deleteAllByUser(user)
+        employeeServiceSpecialtyRepository.deleteAllByEmployee(user)
+
+        userRepository.delete(user)
     }
 }

@@ -1,18 +1,18 @@
 package com.cosbell.controller
 
 import com.cosbell.dto.ProfessionalRegisterRequest
+import com.cosbell.entity.User
 import com.cosbell.service.ProfessionalRegistrationService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/professionals")
 class ProfessionalRegistrationController(
-    private val professionalRegistrationService: ProfessionalRegistrationService
+    private val professionalRegistrationService: ProfessionalRegistrationService,
+    private val professionalService: ProfessionalRegistrationService
+
 ) {
 
     @PostMapping("/register")
@@ -25,5 +25,19 @@ class ProfessionalRegistrationController(
         } catch (e: Exception) {
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf("message" to "Error al registrar profesional: ${e.message}"))
         }
+    }
+    @DeleteMapping("/{id}")
+    fun deleteProfessional(@PathVariable id: Long): ResponseEntity<Void> {
+        professionalService.deleteProfessional(id)
+        return ResponseEntity.noContent().build()
+    }
+
+    @PutMapping("/{id}")
+    fun updateProfessional(
+        @PathVariable id: Long,
+        @RequestBody request: ProfessionalRegisterRequest
+    ): ResponseEntity<User> {
+        val updated = professionalService.updateProfessional(id, request)
+        return ResponseEntity.ok(updated)
     }
 } 

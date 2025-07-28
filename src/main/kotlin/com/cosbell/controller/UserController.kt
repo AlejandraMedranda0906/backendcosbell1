@@ -2,14 +2,10 @@ package com.cosbell.controller
 
 import com.cosbell.entity.User
 import com.cosbell.service.UserService
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
 import com.cosbell.dto.RegisterRequest
 import com.cosbell.dto.EmployeeWithServicesDTO
-import org.springframework.http.ResponseEntity
 import java.security.Principal
 
 @RestController
@@ -50,9 +46,24 @@ class UserController(private val userService: UserService) {
             )
         )
     }
+
     @GetMapping("/debug")
     fun debug(): String {
         return "Debug OK"
     }
 
+    @PutMapping("/{id}")
+    fun editUser(@PathVariable id: Long, @RequestBody request: RegisterRequest): ResponseEntity<User> {
+        val updatedUser = userService.editUser(id, request)
+            ?: return ResponseEntity.notFound().build()
+
+        return ResponseEntity.ok(updatedUser)
+    }
+
+    @DeleteMapping("/{id}")
+    fun deleteUser(@PathVariable id: Long): ResponseEntity<Void> {
+        val deleted = userService.deleteUser(id)
+        return if (deleted) ResponseEntity.noContent().build()
+        else ResponseEntity.notFound().build()
+    }
 }
