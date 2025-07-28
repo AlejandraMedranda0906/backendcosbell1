@@ -7,14 +7,15 @@ import java.time.LocalTime
 @Entity
 @Table(name = "appointment")
 data class Appointment(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "service_id")
+    @JoinColumn(name = "service_id", nullable = false)
     val servicio: Servicio,
 
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     val userId: Long,
 
     @Column(nullable = false)
@@ -29,7 +30,7 @@ data class Appointment(
     @Column(nullable = false)
     val phone: String,
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "employee_id", nullable = false)
     val employee: User,
 

@@ -70,12 +70,20 @@ class AuthService(
             name = request.name,
             email = request.email,
             password = passwordEncoder.encode(request.password),
-            roles = listOf(clientRole) // Asignar automáticamente el rol CLIENT
+            phone = request.phone,               // <-- AGREGA ESTO
+            roles = listOf(clientRole)
         )
         userRepository.save(user)
         val token = jwtService.generateToken(user)
-        return AuthResponse(token = token, email = user.email, role = clientRole.name, message = "Registro exitoso", userId = user.id)
+        return AuthResponse(
+            token = token,
+            email = user.email,
+            role = clientRole.name,
+            message = "Registro exitoso",
+            userId = user.id
+        )
     }
+
 
     fun login(request: LoginRequest): AuthResponse {
         println("Login request received for email: ${request.email}")

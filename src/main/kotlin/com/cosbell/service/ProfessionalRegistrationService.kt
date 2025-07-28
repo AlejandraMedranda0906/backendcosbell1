@@ -31,6 +31,7 @@ class ProfessionalRegistrationService(
             name = request.name,
             email = request.email,
             password = passwordEncoder.encode(request.password),
+            phone = request.phone, // <-- AGREGA ESTA LÍNEA
             roles = listOf(role)
         )
         val savedUser = userRepository.save(user)
@@ -67,4 +68,4 @@ class ProfessionalRegistrationService(
         // Eliminamos la búsqueda del rol y usamos directamente el nombre del rol en la consulta.
         return userRepository.findByRoles_Name("EMPLOYEE")
     }
-} 
+}
