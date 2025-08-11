@@ -12,6 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder
 class NotificationService(
     private val mailSender: JavaMailSender,
     private val userRepository: UserRepository,
+    private val whatsAppService: WhatsAppService
 ) {
 
     fun sendAppointmentConfirmationEmail(appointment: Appointment) {
@@ -107,4 +108,43 @@ class NotificationService(
         message.setText(body)
         mailSender.send(message)
     }
+
+    fun sendAppointmentConfirmationWhatsApp(appointment: Appointment) {
+        val user = try { userRepository.findById(appointment.userId).orElse(null) } catch (e: Exception) { null }
+        val nombre = user?.name ?: "cliente"
+        val negocio = "Cosbell SPA"
+        val servicio = appointment.servicio.name
+        val fecha = appointment.fecha
+        val hora = appointment.hora
+        val empleado = appointment.employee.name
+
+        val body = """
+        Hola $nombre, tu cita en $negocio fue confirmada.
+        Servicio: $servicio
+        Fecha: $fecha  Hora: $hora
+        Profesional: $empleado
+        Si necesitas reprogramar, responde este mensaje.
+    """.trimIndent()
+
+        whatsAppService.sendText(appointment.phone, body)
+    }
+
+    fun sendAppointmentReminderWhatsApp(appointment: Appointment) {
+        val user = try { userRepository.findById(appointment.userId).orElse(null) } catch (e: Exception) { null }
+        val nombre = user?.name ?: "cliente"
+        val negocio = "Cosbell SPA"
+        val servicio = appointment.servicio.name
+        val fecha = appointment.fecha
+        val hora = appointment.hora
+
+        val body = """
+        Recordatorio: $nombre, tu cita en $negocio es hoy.
+        Servicio: $servicio
+        Fecha: $fecha  Hora: $hora
+        Te esperamos.
+    """.trimIndent()
+
+        whatsAppService.sendText(appointment.phone, body)
+    }
+
 } 

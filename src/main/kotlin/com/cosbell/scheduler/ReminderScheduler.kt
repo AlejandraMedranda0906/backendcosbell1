@@ -25,7 +25,7 @@ class ReminderScheduler(
                     // Envía el recordatorio por correo
                     notificationService.sendAppointmentReminderEmail(appointment)
                     // Opcional: registrar también el enlace de WhatsApp si es aplicable para recordatorios
-                    // notificationService.logWhatsAppNotificationLink(appointment)
+                    notificationService.sendAppointmentReminderWhatsApp(appointment)
 
                     // Marca la cita como recordatorio enviado
                     appointmentService.markReminderSent(appointment.id)

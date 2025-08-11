@@ -53,5 +53,5 @@ logging:
     com.cosbell.spa: DEBUG
 
 whatsapp:
-  phone-number-id: TU_PHONE_NUMBER_ID
-  access-token: TU_ACCESS_TOKEN
+  phone-number-id: 762898906903494
+  access-token: EAAKdUrYs5N8BPDmlBUoy501U1K7bO9kG9790WGt17f7w1dwCeZChVjZApbTXXwH7bvqcDnZBoL7IBRSSAD6646N5RoYjcXlzWCNn8X0gw3y9KznNjnXBEcmUPnCW6oheZC1Pp0HEPdXTY4c5lrrZCf4ScWfF7oZAMqolYehKCPtO1tZAxGYiqAPycIuj2sOFFIodZBZCjeBZAoZAwjZCcB6VTsnZAGo7wyMpOZC3ZBd1miPcBPOL25cFy2B

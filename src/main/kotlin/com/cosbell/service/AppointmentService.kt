@@ -53,7 +53,7 @@ class AppointmentService(
 
         val saved = appointmentRepository.save(appointment)
         notificationService.sendAppointmentConfirmationEmail(saved)
-        notificationService.logWhatsAppNotificationLink(saved)
+        notificationService.sendAppointmentConfirmationWhatsApp(saved)
         return saved
     }
 

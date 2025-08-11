@@ -45,6 +45,7 @@ class SecurityConfig(
                 println("SecurityConfig: Configurando reglas de autorización de solicitudes.")
                 auth
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .requestMatchers("/debug/whatsapp").permitAll()
                     .requestMatchers(
                         "/api/auth/login",
                         "/api/auth/register",
