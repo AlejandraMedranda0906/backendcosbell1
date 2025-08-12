@@ -141,21 +141,35 @@ class NotificationService(
     }
 
     fun sendAppointmentReminderWhatsApp(appointment: Appointment) {
-        val user = try { userRepository.findById(appointment.userId).orElse(null) } catch (e: Exception) { null }
+        val user = try { userRepository.findById(appointment.userId).orElse(null) } catch (_: Exception) { null }
         val nombre = user?.name ?: "cliente"
-        val negocio = "Cosbell SPA"
-        val servicio = appointment.servicio.name
-        val fecha = appointment.fecha
-        val hora = appointment.hora
 
-        val body = """
-        Recordatorio: $nombre, tu cita en $negocio es hoy.
-        Servicio: $servicio
-        Fecha: $fecha  Hora: $hora
-        Te esperamos.
-    """.trimIndent()
+        // Usa tu plantilla aprobada. Si tu plantilla se llama distinto, cámbialo aquí.
+        val templateName = "confirmacion"   // o "recordatorio_cita" si creaste otra
+        val language = "en"                 // "es", "es_ES" o el que tenga tu plantilla
 
-        whatsAppService.sendText(appointment.phone, body)
+        // Ordena los parámetros exactamente como están en el cuerpo de tu plantilla
+        // p.ej: Hola {{nombre}}, tu cita en Cosbell SPA...
+        val params = listOf(
+            nombre,
+            appointment.servicio.name,
+            appointment.fecha.toString(),
+            appointment.hora.toString(),
+            appointment.employee.name
+        )
+
+        runCatching {
+            val ok = whatsAppService.sendTemplate(
+                toE164 = appointment.phone,   // en E.164 (ej. 593962945061)
+                templateName = templateName,
+                languageCode = language,
+                bodyParams = params
+            )
+            if (!ok) System.err.println("[Notify][WA][reminder] envío fallido (revisa nombre/idioma de la plantilla y parámetros)")
+        }.onFailure {
+            System.err.println("[Notify][WA][reminder] excepción: ${it.message}")
+        }
     }
+
 
 } 

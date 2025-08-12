@@ -47,6 +47,60 @@ class WhatsAppService(
             log.error("[WhatsApp] Excepción enviando: ${e.message}", e)
             false
         }
+
+    }
+    fun sendTemplate(
+        toE164: String,
+        templateName: String,
+        languageCode: String = "en",              // o "es" según tu plantilla
+        bodyParams: List<String> = emptyList()    // valores para {{1}}, {{2}}, ...
+    ): Boolean {
+        if (phoneNumberId.isBlank() || accessToken.isBlank()) {
+            log.warn("[WhatsApp] No configurado. Falta phone-number-id o access-token")
+            return false
+        }
+        val url = "https://graph.facebook.com/v20.0/$phoneNumberId/messages"
+
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+            setBearerAuth(accessToken)
+        }
+
+        // Construye el bloque "components" solo si hay variables en el body
+        val bodyComponent =
+            if (bodyParams.isNotEmpty())
+                listOf(
+                    mapOf(
+                        "type" to "body",
+                        "parameters" to bodyParams.map { p -> mapOf("type" to "text", "text" to p) }
+                    )
+                )
+            else emptyList()
+
+        val payload = mapOf(
+            "messaging_product" to "whatsapp",
+            "to" to toE164.filter { it.isDigit() },
+            "type" to "template",
+            "template" to mapOf(
+                "name" to templateName,                    // ej: "confirmacion"
+                "language" to mapOf("code" to languageCode), // "es" o "en"
+                "components" to bodyComponent
+            )
+        )
+
+        return try {
+            val res = http.postForEntity(url, HttpEntity(payload, headers), Map::class.java)
+            if (res.statusCode.is2xxSuccessful) {
+                log.info("[WhatsApp TEMPLATE] OK -> {}", res.body)
+                true
+            } else {
+                log.error("[WhatsApp TEMPLATE] HTTP {} -> {}", res.statusCodeValue, res.body)
+                false
+            }
+        } catch (e: Exception) {
+            log.error("[WhatsApp TEMPLATE] Excepción: ${e.message}", e)
+            false
+        }
     }
 
 }

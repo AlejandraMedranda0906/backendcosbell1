@@ -6,7 +6,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: mayramedranda17@gmail.com
-    password: sofo oayu ybhl xpwn
+    password: tqjr ndpd utkd yydn
     properties:
       mail:
         smtp:
@@ -54,4 +54,4 @@ logging:
 
 whatsapp:
   phone-number-id: 762898906903494
-  access-token: EAAKdUrYs5N8BPDmlBUoy501U1K7bO9kG9790WGt17f7w1dwCeZChVjZApbTXXwH7bvqcDnZBoL7IBRSSAD6646N5RoYjcXlzWCNn8X0gw3y9KznNjnXBEcmUPnCW6oheZC1Pp0HEPdXTY4c5lrrZCf4ScWfF7oZAMqolYehKCPtO1tZAxGYiqAPycIuj2sOFFIodZBZCjeBZAoZAwjZCcB6VTsnZAGo7wyMpOZC3ZBd1miPcBPOL25cFy2B
+  access-token: EAAKdUrYs5N8BPA78yaJcVp1etJiqcZAq784uuYK2eKgjEqyXWGERPOyxJXfnqEfq0SuBdG2dkUX7xnV9EMZBYqH99g7lZCCUfc7unOozJdM86hZBYTgWCZBts5ZCdt6KVzhvZACa7gRCOZB938CEYX9WZCedbZCcaZCHhsj3LioZCxgZBvdlg3e3unoDM94WZAYx8fhGUMTbx5ZCvk1yn7XnIZABWc1ar6gBbwuyKeCDTS11qIttOLzJ1AZDZD
