@@ -52,9 +52,15 @@ class AppointmentService(
         )
 
         val saved = appointmentRepository.save(appointment)
-        notificationService.sendAppointmentConfirmationEmail(saved)
-        notificationService.sendAppointmentConfirmationWhatsApp(saved)
+
+        try { notificationService.sendAppointmentConfirmationEmail(saved) }
+        catch (e: Exception) { System.err.println("[Notify][Email] ${e.message}") }
+
+        try { notificationService.sendAppointmentConfirmationWhatsApp(saved) }
+        catch (e: Exception) { System.err.println("[Notify][WA] ${e.message}") }
+
         return saved
+
     }
 
     fun findByUserId(

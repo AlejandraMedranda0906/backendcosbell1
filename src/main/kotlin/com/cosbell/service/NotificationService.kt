@@ -16,28 +16,39 @@ class NotificationService(
 ) {
 
     fun sendAppointmentConfirmationEmail(appointment: Appointment) {
-        val user = userRepository.findById(appointment.userId)
-            .orElseThrow { Exception("Usuario no encontrado para el ID: ${appointment.userId}") }
+        try {
+            val user = runCatching {
+                userRepository.findById(appointment.userId).orElse(null)
+            }.getOrNull()
 
-        val message = SimpleMailMessage()
-        message.setTo(appointment.email)
-        message.setSubject("Confirmación de Cita Cosbell SPA")
-        message.setText("""
-            ¡Hola ${user.name}!
+            val nombre = user?.name ?: "cliente"
 
-            Tu cita ha sido confirmada con éxito.
-            Detalles de la cita:
-            Servicio: ${appointment.servicio.name}
-            Fecha: ${appointment.fecha}
-            Hora: ${appointment.hora}
-            Profesional: ${appointment.employee.name}
+            val message = SimpleMailMessage().apply {
+                setTo(appointment.email)
+                subject = "Confirmación de Cita Cosbell SPA"
+                text = """
+                ¡Hola $nombre!
 
-            ¡Esperamos verte pronto!
-            Atentamente,
-            Cosbell SPA
-        """.trimIndent())
-        mailSender.send(message)
+                Tu cita ha sido confirmada con éxito.
+                Detalles de la cita:
+                Servicio: ${appointment.servicio.name}
+                Fecha: ${appointment.fecha}
+                Hora: ${appointment.hora}
+                Profesional: ${appointment.employee.name}
+
+                ¡Esperamos verte pronto!
+                Atentamente,
+                Cosbell SPA
+            """.trimIndent()
+            }
+
+            mailSender.send(message)
+        } catch (ex: Exception) {
+            System.err.println("[Email] Error enviando confirmación: ${ex.message}")
+            // Importante: NO relanzar; no debe tumbar la creación de la cita
+        }
     }
+
 
     fun sendAppointmentReminderEmail(appointment: Appointment) {
         val user = userRepository.findById(appointment.userId)
